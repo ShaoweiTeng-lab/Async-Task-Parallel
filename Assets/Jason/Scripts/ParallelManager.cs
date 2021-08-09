@@ -26,10 +26,6 @@ public class ParallelManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        /*
-           Parallel.For()
-     
-         */
         #region Parallel.Invoke 
         // Parallel.Invoke 內的委派沒執行完不不會跳出 Parallel執行緒(但是  Parallel內部執行會因 thread.sleap而改變順序)
         //Action<string> ActionTest = (string data) =>{ Thread.Sleep(5000);  Debug.Log($" ActionTest  ,thread :  {Thread.CurrentThread.ManagedThreadId}  data : {data}");  };
@@ -45,8 +41,11 @@ public class ParallelManager : MonoBehaviour
         //Debug.Log("結束");
         #endregion
         #region Parallel.for
-        //前两個参数定義了循環的開頭和结束。第 3個参数是一個Action<int>委托。 整数参数是循環的迭代次数,該參數被傳遞给Action<int>委托引用的方法，由於每次循環都開啟了新的任务和線呈，因此每个線程的直行行顺序是不能保正的。
-
+        /* 
+           Parallel.For(int fromInclusive, int toExclusive, Action<int, ParallelLoopState> body);
+           前两個参数定義了循環的開頭和结束。第 3個参数是一個Action<int>委托。 整数参数是循環的迭代次数,該參數被傳遞给Action<int>委托引用的方法，由於每次循環都開啟了新的任务和線呈，因此每个線程的直行行顺序是不能保正的。
+        */
+        //i 代表索引值
         //ParallelLoopResult result = Parallel.For(0, 10, i => {
         //    Debug.Log(i);
         //});
@@ -56,11 +55,13 @@ public class ParallelManager : MonoBehaviour
         //int[] nums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
         //Parallel.For(0, nums.Length, (i) =>
         //{
-        //    Debug.Log($"num[i] :  {i}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+        //    Debug.Log($"num[i] :  {nums[i]} ,索引為{i}, task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
         //});
 
         //========================中斷  (Stop/Break)========================================================
         /*
+         
+         Parallel.For()方法的一個多載接受第3個Action<int, ParallelLoopState>类型的参數。就可以调用ParalleLoopState的Break()或Stop()方法,以影響循環的结果。
          Stop和Break，可以分別用來控制Parallel.For的執行。 
          Stop  (像迴圈中的break): 
                 表示Parallel.For的執行立刻停止，無論其他執行單元是否達到停止的條件。
@@ -70,21 +71,22 @@ public class ParallelManager : MonoBehaviour
          
          */
         //int[] nums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-        //break
+        ////break
         //Parallel.For(1, nums.Length, (i, ParallelLoopState) =>
         //{
-        //    // 當某一個迴圈單元的數大於30，
+        //    // 當某一個迴圈單元的數大於x，
         //    // 則跳出當前執行單元，等待其他執行單元結束
         //    // 所有執行單元結束後退出Parallel.For的執行
 
-        //    if (i > 5)
+        //    if (nums[i] == 5)//其內容等於5  往下不執行  
         //    {
         //        // 跳出當前執行單元
         //        ParallelLoopState.Break();
         //        Debug.Log("break");
         //        return;//不加return，可能會發生該程序資源未釋放。
         //    }
-        //    Debug.Log($" {i}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+
+        //    Debug.Log($"num[i] :  {nums[i]}  , 索引為{i} , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
         //});
         //stop
         //Parallel.For(0, nums.Length, (int i, ParallelLoopState pls) =>
@@ -92,16 +94,45 @@ public class ParallelManager : MonoBehaviour
         //    // 當某一個迴圈單元的數大於x，
         //    // 則停止Parallel.For的執行
 
-        //    if (i > 5)
-        //    {
-        //        // 停止並退出Parallel.For
-        //        pls.Stop();
-        //        return;
-        //    }
-        //    Debug.Log($" {i}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+        //if (nums[i] > 5)//其內容大於5 
+        //{
+        //    // 跳出當前執行單元
+        //    ParallelLoopState.Break();
+        //    Debug.Log("break");
+        //    return;//不加return，可能會發生該程序資源未釋放。
+        //}
+        //    Debug.Log($"num[i] :  {nums[i]}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
         //});
         //Debug.Log("結束");
 
+        #endregion
+        #region Parallel.ForEach()
+        List<int> nums = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        //ParallelLoopResult result = Parallel.ForEach<int>(nums, (data) =>
+        //{
+        //    Debug.Log(data);
+        //});
+        //============================中斷==========================
+        //Parallel.ForEach<int>(nums, (data, ParallelLoopState) =>
+        //{
+        //    if (data ==5)
+        //    {
+        //        ParallelLoopState.Break();
+        //        return;
+        //    }
+        //    Debug.Log($"num[i] :  {data}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+             
+        //});
+        Parallel.ForEach<int>(nums, (data, ParallelLoopState) =>
+        {
+            if (data > 5)
+            {
+                ParallelLoopState.Stop();
+                return;
+            }
+            Debug.Log($"num[i] :  {data}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+
+        });
         #endregion
         #region 情境題
         /*
