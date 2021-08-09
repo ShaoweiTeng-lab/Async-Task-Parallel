@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using System.Threading.Tasks;//非同步使用
+using System.IO;
+using System.Text;
+
 public class AsyncManager : MonoBehaviour
 {/*
    同步和異步主要用於修飾方法。
@@ -155,4 +158,29 @@ public class AsyncManager : MonoBehaviour
         await Task.Delay(3000);
         Debug.Log("VoidNoAsync finish");
     }
+
+    #region 異步讀取文件內容
+    //異步讀取文件內容
+    async static Task<string> GetContentAsync(string filename)
+    {
+
+        FileStream fs = new FileStream(filename, FileMode.Open);
+        var bytes = new byte[fs.Length];
+        //ReadAync方法異步讀取內容，不阻塞線程
+        Debug.Log("開始讀取文件");
+        int len = await fs.ReadAsync(bytes, 0, bytes.Length);
+        string result = Encoding.UTF8.GetString(bytes);
+        return result;
+    }
+    //同步讀取文件內容
+    static string GetContent(string filename)
+    {
+        FileStream fs = new FileStream(filename, FileMode.Open);
+        var bytes = new byte[fs.Length];
+        //Read方法同步讀取內容，阻塞線程
+        int len = fs.Read(bytes, 0, bytes.Length);
+        string result = Encoding.UTF8.GetString(bytes);
+        return result;
+    }
+    #endregion
 }

@@ -4,13 +4,17 @@ using UnityEngine;
 
 using System.Threading.Tasks;
 using System.Threading;
+using System;
+
 public class TaskManager : MonoBehaviour
 {   /*
     https://www.itread01.com/content/1557344296.html
     Task是在ThreadPool的基礎上推出的，ThreadPool中有若幹數量的線程，如果有任務需要處理時，會從線程池中獲取一個空閒的線程來執行任務，任務執行完畢後線程不會銷毀，
     而是被線程池回收以供後續任務使用。當線程池中所有的線程都在忙碌時，又有新任務要處理時，線程池才會新建一個線程來處理該任務，如果線程數量達到設置的最大值，任務
     會排隊，等待其他任務釋放線程後再執行。線程池能減少線程的創建，節省開銷   
-    */
+    */ 
+    private static SemaphoreSlim Locker = new SemaphoreSlim(1);//限制 每次進入執行緒之 數量
+    public static int count;
     // Start is called before the first frame update
     void Start()
     {
@@ -19,7 +23,7 @@ public class TaskManager : MonoBehaviour
         //Task tastVoid = new Task(Test);
         //t1.Start();
         //tastVoid.Start();
-        # region Task創建
+        #region Task創建
         //=================Task創建方式======================================================================================
         //Task創建方式有三種 ,ThreadPool不能控制線程的執行順序，我們也不能獲取線程池內線程取消/異常/完成的通知，不能有效監控和控制線程池中的線程
         //1.new方式實例化一個Task，需要通過Start方法啟動
@@ -99,36 +103,107 @@ public class TaskManager : MonoBehaviour
         #endregion
 
         #region Task取消任務執行
-        CancellationTokenSource source = new CancellationTokenSource();
-        int index = 0;
+        //CancellationTokenSource source = new CancellationTokenSource();
+        //int index = 0;
         //開啟一個task執行任務
-        Task task1 = new Task(() =>
-        {
-            while (!source.IsCancellationRequested)
-            {
-                Thread.Sleep(1000);
-                Debug.Log($"第{++index}次執行，線程運行中...");
-            }
-        });
-        task1.Start();
-        //五秒後取消任務執行 
-        Thread.Sleep(5000);
-        //source.Cancel()方法請求取消任務，IsCancellationRequested會變成true
-        source.Cancel();
-        Thread.Sleep(500);
-        Debug.Log("取消任務");
-         
+        //Task task1 = new Task(() =>
+        //{
+        //    while (!source.IsCancellationRequested)
+        //    {
+
+        //        Debug.Log($"第{++index}次執行，線程運行中...");//在文章內 會先執行 Thread.Sleep(1000),但有時執行時會 跑到第六次 ，大概是因為在 進入第六次thread.sleep 時 CancellationTokenSourceh 才變true(可能兩者的執行緒不同 因此計算不同 有誤差)
+        //                                                       //因此無法鎖到
+        //        Thread.Sleep(1000);
+        //    }
+        //});
+        //task1.Start();
+        ////五秒後取消任務執行 
+        //Thread.Sleep(5000);
+        ////source.Cancel()方法請求取消任務，IsCancellationRequested會變成true
+        //source.Cancel();
+        //Debug.Log("執行緒結束");
+        /*
+        CancellationTokenSource的功能不僅僅是取消任務執行，我們可以使用 source.CancelAfter(5000) 實現5秒後自動取消任務，也可以通過 source.Token.Register(Action action) 
+        註冊取消任務觸發的回調函數，即任務被取消時註冊的action會被執行。 
+        */
+        //CancellationTokenSource source = new CancellationTokenSource();
+        ////註冊任務取消的事件
+        //source.Token.Register(() =>
+        //{
+        //    Debug.Log("任務被取消後執行xx操作！");
+
+        //});
+
+        //int index = 0;
+        ////開啟一個task執行任務
+        //Task task1 = new Task(() =>
+        //{
+
+        //    while (!source.IsCancellationRequested)
+        //    {
+
+        //        Debug.Log($"第{++index}次執行，線程運行中..." + source.IsCancellationRequested);//在文章內 會先執行 Thread.Sleep(1000),但有時執行時會 跑到第六次 ，大概是因為在 進入第六次thread.sleep 時 CancellationTokenSourceh 才變true(可能兩者的執行緒不同 因此計算不同 有誤差)
+        //                                                                                        //因此無法鎖到
+
+        //        Thread.Sleep(1000);
+        //    }
+        //});
+        //task1.Start();
+        ////延時取消，效果等同於Thread.Sleep(5000);source.Cancel(); 
+        //source.CancelAfter(5000);
+
         #endregion
-    }
+        #region 實現 locker
+        //https://www.dotblogs.com.tw/supershowwei/2020/04/27/090746
+        /*
+        第一時間我們一定是先想到 lock 陳述式，但是 lock 陳述式無法在 async/await 的場景下使用，程式編譯不會通過，我們會得到一個錯誤訊息 - 
+        ====================================================================================================================================
+        SemaphoreSlim 的運作概念:
+        是 Semaphore 的輕量化版本，使用起來更為簡便，可以想像有一個工具箱，一開始被放置了 n 把工具，整個工具箱最多可以放置 m 把工具，每個工人需要在工作之前從工具箱取走至少 1 把工具才能進行作業，直到工具箱沒有工具時，
+        之後的工人就必須等待，等到有工人完成作業將工具歸還到工具箱，才能繼續從工具箱取走工具進行作業，而總工具數量也不是一成不變的，可以視整體的工作情況進行增減，但要注意工具箱的可容納上限
+        整個概念對照 SemaphoreSlim 實際的屬性跟方法如下：
 
-    // Update is called once per frame
-    void Update()
-    {
+        一個工具箱：一個 SemaphoreSlim 實例
+        一開始被放置的 n 把工具：SemaphoreSlim 建構式的 initialCount
+        最多可以放置 m 把工具：SemaphoreSlim 建構式的 maxCount，預設值為 Int32.MaxValue。
+        工人：執行程式的 Thread
+        取走工具：SemaphoreSlim 的 Wait() 方法
+        歸還工具：SemaphoreSlim 的 Release() 方法
+        增減總工具數量：Wait() 少、Release() 多；Wait() 多、Release() 少。
 
+        
+        */
+        LockDoWork();
+        LockDoWork();
+        #endregion
     }
     void Test()
     {
 
         Debug.Log("Test Task");
+    }
+    //SemaphoreSlim 能用在 async/await 上最主要的是，它並沒有強制必須由同一個 Thread 來 Wait() 和 Release()
+    static async Task LockDoWork()
+    {
+        await Locker.WaitAsync();
+        await Task.Run(
+            () =>
+            {
+
+                count++;
+                Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
+                Thread.Sleep(3000);
+                //if (count < 1)//限制條件 只執行一次
+                //{
+                //    count++;
+                //    Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
+                //    Thread.Sleep(3000);
+                //}
+                
+            });
+
+        Locker.Release();
+
+
     }
 }
