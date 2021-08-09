@@ -186,7 +186,9 @@ public class TaskManager : MonoBehaviour
     static async Task LockDoWork()
     {
         await Locker.WaitAsync();
-        //Thread.Sleep就是對本身自己這個執行緒，進行睡眠的功能。而反觀Task.Delay是指，在本身這個執行緒下再去生出一個新的執行緒，並對這個執行緒做時間計算。因此Task.Delay如果是要用在延遲的作用上，那麼就得要在前面加上個await才會有效
+        //Thread.Sleep就是對本身自己這個執行緒，進行睡眠的功能。而反觀Task.Delay是指，在本身這個執行緒下再去生出一個新的執行緒，並對這個執行緒做時間計算。
+        //父執行緒生出一個子執行緒，並且叫子執行緒等候1秒，此時父執行緒的下一行早就被運行了，也就是說，子執行緒有沒有跑完根本不關父執行緒的事情了。
+        //因此Task.Delay如果是要用在延遲的作用上，那麼就得要在前面加上個await才會有效 且該方法必須為 async
         //http://slashview.com/archive2016/20160201.html
         #region 使用Thread.Sleep
         //使用Thread.Sleep( );
@@ -223,7 +225,7 @@ public class TaskManager : MonoBehaviour
 
         //   });
         #endregion
-        Locker.Release();
+        Locker.Release();//執行完後釋放
 
 
     }
