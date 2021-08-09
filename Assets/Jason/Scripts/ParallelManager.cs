@@ -31,7 +31,7 @@ public class ParallelManager : MonoBehaviour
      
          */
         #region Parallel.Invoke 
-        // Parallel.Invoke 內的未派沒執行完部不會跳出 Parallel執行緒(但是  Parallel內部會因 thread.sleap而改變順序)
+        // Parallel.Invoke 內的委派沒執行完不不會跳出 Parallel執行緒(但是  Parallel內部執行會因 thread.sleap而改變順序)
         Action<string> ActionTest = (string data) =>{ Thread.Sleep(5000);  Debug.Log($" ActionTest  ,thread :  {Thread.CurrentThread.ManagedThreadId}  data : {data}");  };
         Action<string> ActionTest2 = (string data) => { Thread.Sleep(200); Debug.Log($"ActionTest2  ,thread :  {Thread.CurrentThread.ManagedThreadId}  data : {data}"); };
         Action[] actions = new Action[] //定義委派陣列 並執行
