@@ -4,20 +4,31 @@ using UnityEngine;
 
 using System.Threading.Tasks;//非同步使用
 public class AsyncManager : MonoBehaviour
-{
-    //   async 回傳型別
-    //https://www.youtube.com/watch?v=gxaJyuf-2dI
-    //async 必須與 await搭配 ,await可回傳值 比起coritine 有用多
-    // await 意思是 等待此行結束玩才往下執行 (前提是 該方法 命名為 async )
-    //宣告為 async 的.NET 方法必須傳回(await _)以下三種型別之一：
-    // task = 一項任務 可直接使用 不一定要放在void 中
-    //1. Task
-    //     作業結束時將控制權還給呼叫端
-    //2. Task<T>
-    //     作業結束時回傳型別為 T 的物件給呼叫端
-    //3. void
-    //    採射後不理(Fire-and-Forget)哲學，呼叫後即失去掌握 
-    // Start is called before the first frame update
+{/*
+   同步和異步主要用於修飾方法。
+
+   同步:
+   當一個方法被調用時，調用者需要等待該方法執行完畢並返回才能繼續執行，我們稱這個方法是同步方法；
+   ------------------------------------------------------------------------------------------------------------------------------------------------
+   異步:
+   當一個方法被調用時立即返回，並獲取一個線程執行該方法內部的業務，調用者不用等待該方法執行完畢，我們稱這個方法為異步方法。
+   ------------------------------------------------------------------------------------------------------------------------------------------------
+　 異步的好處在於非阻塞(調用線程不會暫停執行去等待子線程完成)，因此我們把一些不需要立即使用結果、較耗時的任務設為異步執行，可以提高程序的運行效率 
+   ===============================================================================================================================================
+   async 回傳型別
+   https://www.youtube.com/watch?v=gxaJyuf-2dI
+   async 必須與 await搭配, await可回傳值 比起coritine 有用多
+   await 意思是 等待此行結束玩才往下執行(前提是 該方法 命名為 async)
+   宣告為 async 的.NET 方法必須傳回(await _)以下三種型別之一：
+   task = 一項任務 可直接使用 不一定要放在void 中
+   1. Task
+         作業結束時將控制權還給呼叫端
+   2. Task<T>
+         作業結束時回傳型別為 T 的物件給呼叫端
+   3. void
+        採射後不理(Fire-and-Forget)哲學，呼叫後即失去掌握
+     Start is called before the first frame update
+    */
     void Start()
     {
 
@@ -33,7 +44,7 @@ public class AsyncManager : MonoBehaviour
         //沒加async 之方法 不會等待執行
         VoidNoAsyncFunc();
         //NoAsync();
-       
+
 
     }
 
@@ -74,12 +85,13 @@ public class AsyncManager : MonoBehaviour
     #endregion
 
     #region task另外寫宣告 可先往下執行
-    async void taskFunction() {
+    async void taskFunction()
+    {
         Task M_aSYNC = m_async();
-        Debug.Log("async執行中"); 
+        Debug.Log("async執行中");
     }
     #endregion
-   
+
     /// <summary>
     /// 回傳task
     /// </summary>
@@ -90,7 +102,8 @@ public class AsyncManager : MonoBehaviour
         Debug.Log("m_async 執行完");
 
     }
-    async void AsyncGetString() {
+    async void AsyncGetString()
+    {
         Debug.Log("GetString 開始");
         string getString = await strAsync("strAsync");
         Debug.Log(getString);
@@ -101,37 +114,43 @@ public class AsyncManager : MonoBehaviour
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    async Task<string> strAsync(string GetString) {
-        await Task.Delay(3000); 
+    async Task<string> strAsync(string GetString)
+    {
+        await Task.Delay(3000);
         return GetString;
     }
 
-    async Task ShowNovoid() {
+    async Task ShowNovoid()
+    {
         Debug.Log("start wait");
         await Task.Delay(3000);
 
         Debug.Log("Finish");
-    
+
     }
-    async void TaskRun() {
-        await Task.Run(()=>{
+    async void TaskRun()
+    {
+        await Task.Run(() =>
+        {
             Task.Delay(3000);
             Debug.Log("wait finish");
-        
-        
-        
+
+
+
         });
-    
+
     }
     /// <summary>
     /// Void 不加 async 只在 方法內部呼叫任務
     /// </summary>
-   void VoidNoAsyncFunc() {
+    void VoidNoAsyncFunc()
+    {
         Debug.Log("Function 執行");
         VoidNoAsync();//若要等待此方法執行完才繼續 則必續使用await 及 async ，否則先往下執行
         Debug.Log("Function 執行結束");
     }
-    async Task VoidNoAsync() {
+    async Task VoidNoAsync()
+    {
         Debug.Log("VoidNoAsync start");
         await Task.Delay(3000);
         Debug.Log("VoidNoAsync finish");
