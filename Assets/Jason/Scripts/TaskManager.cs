@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,66 +6,80 @@ using System.Threading.Tasks;
 using System.Threading;
 public class TaskManager : MonoBehaviour
 {   /*
-    Task¬O¦bThreadPoolªº°òÂ¦¤W±À¥Xªº¡AThreadPool¤¤¦³­Y·F¼Æ¶qªº½uµ{¡A¦pªG¦³¥ô°È»İ­n³B²z®É¡A·|±q½uµ{¦À¤¤Àò¨ú¤@­ÓªÅ¶¢ªº½uµ{¨Ó°õ¦æ¥ô°È¡A¥ô°È°õ¦æ§¹²¦«á½uµ{¤£·|¾P·´¡A
-    ¦Ó¬O³Q½uµ{¦À¦^¦¬¥H¨Ñ«áÄò¥ô°È¨Ï¥Î¡C·í½uµ{¦À¤¤©Ò¦³ªº½uµ{³£¦b¦£¸L®É¡A¤S¦³·s¥ô°È­n³B²z®É¡A½uµ{¦À¤~·|·s«Ø¤@­Ó½uµ{¨Ó³B²z¸Ó¥ô°È¡A¦pªG½uµ{¼Æ¶q¹F¨ì³]¸mªº³Ì¤j­È¡A¥ô°È
-    ·|±Æ¶¤¡Aµ¥«İ¨ä¥L¥ô°ÈÄÀ©ñ½uµ{«á¦A°õ¦æ¡C½uµ{¦À¯à´î¤Ö½uµ{ªº³Ğ«Ø¡A¸`¬Ù¶}¾P   
+    https://www.itread01.com/content/1557344296.html
+    Taskæ˜¯åœ¨ThreadPoolçš„åŸºç¤ä¸Šæ¨å‡ºçš„ï¼ŒThreadPoolä¸­æœ‰è‹¥å¹¹æ•¸é‡çš„ç·šç¨‹ï¼Œå¦‚æœæœ‰ä»»å‹™éœ€è¦è™•ç†æ™‚ï¼Œæœƒå¾ç·šç¨‹æ± ä¸­ç²å–ä¸€å€‹ç©ºé–’çš„ç·šç¨‹ä¾†åŸ·è¡Œä»»å‹™ï¼Œä»»å‹™åŸ·è¡Œå®Œç•¢å¾Œç·šç¨‹ä¸æœƒéŠ·æ¯€ï¼Œ
+    è€Œæ˜¯è¢«ç·šç¨‹æ± å›æ”¶ä»¥ä¾›å¾ŒçºŒä»»å‹™ä½¿ç”¨ã€‚ç•¶ç·šç¨‹æ± ä¸­æ‰€æœ‰çš„ç·šç¨‹éƒ½åœ¨å¿™ç¢Œæ™‚ï¼Œåˆæœ‰æ–°ä»»å‹™è¦è™•ç†æ™‚ï¼Œç·šç¨‹æ± æ‰æœƒæ–°å»ºä¸€å€‹ç·šç¨‹ä¾†è™•ç†è©²ä»»å‹™ï¼Œå¦‚æœç·šç¨‹æ•¸é‡é”åˆ°è¨­ç½®çš„æœ€å¤§å€¼ï¼Œä»»å‹™
+    æœƒæ’éšŠï¼Œç­‰å¾…å…¶ä»–ä»»å‹™é‡‹æ”¾ç·šç¨‹å¾Œå†åŸ·è¡Œã€‚ç·šç¨‹æ± èƒ½æ¸›å°‘ç·šç¨‹çš„å‰µå»ºï¼Œç¯€çœé–‹éŠ·   
     */
     // Start is called before the first frame update
     void Start()
     {
-
-        //Task t1 = new Task(() => { Debug.Log("t1 Start new Task"); });//¨âªÌ¬O­Ó§O¶}·s°õ¦æºü ©Ò¥H°õ¦æ¶¶§Ç¤£¤@©w
+        //å…©è€…æ˜¯å€‹åˆ¥é–‹æ–°åŸ·è¡Œç·’ æ‰€ä»¥åŸ·è¡Œé †åºä¸å®š
+        //Task t1 = new Task(() => { Debug.Log("t1 Start new Task"); }); 
         //Task tastVoid = new Task(Test);
         //t1.Start();
         //tastVoid.Start();
-        //=================Task³Ğ«Ø¤è¦¡======================================================================================
-        //Task³Ğ«Ø¤è¦¡¦³¤TºØ ,ThreadPool¤£¯à±±¨î½uµ{ªº°õ¦æ¶¶§Ç¡A§Ú­Ì¤]¤£¯àÀò¨ú½uµ{¦À¤º½uµ{¨ú®ø/²§±`/§¹¦¨ªº³qª¾¡A¤£¯à¦³®ÄºÊ±±©M±±¨î½uµ{¦À¤¤ªº½uµ{
-        //1.new¤è¦¡¹ê¨Ò¤Æ¤@­ÓTask¡A»İ­n³q¹LStart¤èªk±Ò°Ê
+        //=================Taskå‰µå»ºæ–¹å¼======================================================================================
+        //Taskå‰µå»ºæ–¹å¼æœ‰ä¸‰ç¨® ,ThreadPoolä¸èƒ½æ§åˆ¶ç·šç¨‹çš„åŸ·è¡Œé †åºï¼Œæˆ‘å€‘ä¹Ÿä¸èƒ½ç²å–ç·šç¨‹æ± å…§ç·šç¨‹å–æ¶ˆ/ç•°å¸¸/å®Œæˆçš„é€šçŸ¥ï¼Œä¸èƒ½æœ‰æ•ˆç›£æ§å’Œæ§åˆ¶ç·šç¨‹æ± ä¸­çš„ç·šç¨‹
+        //1.newæ–¹å¼å¯¦ä¾‹åŒ–ä¸€å€‹Taskï¼Œéœ€è¦é€šéStartæ–¹æ³•å•Ÿå‹•
         //Task task = new Task(() =>
         //{
         //    Thread.Sleep(100);
-        //    Debug.Log($"hello, task1ªº½uµ{ID¬°{Thread.CurrentThread.ManagedThreadId}");
+        //    Debug.Log($"hello, task1çš„ç·šç¨‹IDç‚º{Thread.CurrentThread.ManagedThreadId}");
         //});
         //task.Start();
 
-        ////2.Task.Factory.StartNew(Action action)³Ğ«Ø©M±Ò°Ê¤@­ÓTask
+        ////2.Task.Factory.StartNew(Action action)å‰µå»ºå’Œå•Ÿå‹•ä¸€å€‹Task
         //Task task2 = Task.Factory.StartNew(() =>
         //{
         //    Thread.Sleep(100);
-        //    Debug.Log($"hello, task2ªº½uµ{ID¬°{ Thread.CurrentThread.ManagedThreadId}");
+        //    Debug.Log($"hello, task2çš„ç·šç¨‹IDç‚º{ Thread.CurrentThread.ManagedThreadId}");
         //});
 
-        ////3.Task.Run(Action action)±N¥ô°È©ñ¦b½uµ{¦À¶¤¦C¡Aªğ¦^¨Ã±Ò°Ê¤@­ÓTask
+        ////3.Task.Run(Action action)å°‡ä»»å‹™æ”¾åœ¨ç·šç¨‹æ± éšŠåˆ—ï¼Œè¿”å›ä¸¦å•Ÿå‹•ä¸€å€‹Task
         //Task task3 = Task.Run(() =>
         //{
         //    Thread.Sleep(100);
-        //    Debug.Log($"hello, task3ªº½uµ{ID¬°{ Thread.CurrentThread.ManagedThreadId}");
+        //    Debug.Log($"hello, task3çš„ç·šç¨‹IDç‚º{ Thread.CurrentThread.ManagedThreadId}");
         //});
 
 
-        //===========Taskªº©µÄò¾Ş§@(WhenAny/WhenAll/ContinueWith) ¹ê²{ªı¶ë½uµ{===============================================================
+        //===========Taskçš„å»¶çºŒæ“ä½œ(WhenAny/WhenAll/ContinueWith) å¯¦ç¾é˜»å¡ç·šç¨‹===============================================================
         /*
-         Wait/WaitAny/WaitAll¤èªkªğ¦^­È¬°void¡A³o¨Ç¤èªk³æ¯Âªº¹ê²{ªı¶ë½uµ{¡C§Ú­Ì²{¦b·QÅı©Ò¦³task°õ¦æ§¹²¦(©ÎªÌ¥ô¤@task°õ¦æ§¹²¦)«á¡A¶}©l°õ¦æ«áÄò¾Ş§@¡A³o®É´N¥i¥H¥Î¨ìWhenAny/WhenAll¤èªk¡A
-         ³o¨Ç¤èªk°õ¦æ§¹¦¨ªğ¦^¤@­Ótask¹ê¨Ò¡Ctask.WhenAll(Task[] tasks) ªí¥Ü©Ò¦³ªºtask³£°õ¦æ§¹²¦«á¦A¥h°õ¦æ«áÄòªº¾Ş§@¡A task.WhenAny(Task[] tasks) ªí¥Ü¥ô¤@task°õ¦æ§¹²¦«á´N¶}©l°õ¦æ«áÄò¾Ş§@
+         Threadçš„Joinæ–¹æ³•å¯ä»¥é˜»å¡èª¿ç”¨ç·šç¨‹ï¼Œä½†æ˜¯æœ‰ä¸€äº›å¼Šç«¯ï¼šâ‘ å¦‚æœæˆ‘å€‘è¦å¯¦ç¾å¾ˆå¤šç·šç¨‹çš„é˜»å¡æ™‚ï¼Œæ¯å€‹ç·šç¨‹éƒ½è¦èª¿ç”¨ä¸€æ¬¡Joinæ–¹æ³•ï¼›â‘¡å¦‚æœæˆ‘å€‘æƒ³è®“æ‰€æœ‰çš„ç·šç¨‹åŸ·è¡Œå®Œç•¢(æˆ–è€…ä»»ä¸€ç·šç¨‹åŸ·è¡Œå®Œç•¢)æ™‚ï¼Œç«‹å³è§£é™¤é˜»å¡ï¼Œä½¿ç”¨Joinæ–¹æ³•ä¸å®¹æ˜“å¯¦ç¾ã€‚
+         Taskæä¾›äº† Wait/WaitAny/WaitAll æ–¹æ³•ï¼Œå¯ä»¥æ›´æ–¹ä¾¿åœ°æ§åˆ¶ç·šç¨‹é˜»å¡ã€‚
+         task.Wait() è¡¨ç¤ºç­‰å¾…taskåŸ·è¡Œå®Œç•¢ï¼ŒåŠŸèƒ½é¡ä¼¼æ–¼thead.Join()ï¼› Task.WaitAll(Task[] tasks) è¡¨ç¤ºåªæœ‰æ‰€æœ‰çš„taskéƒ½åŸ·è¡Œå®Œæˆäº†å†è§£é™¤é˜»å¡ 
+         ==========================================WhenAny/WhenAll/ContinueWith  ========================================================================================================================= 
+         Wait/WaitAny/WaitAllæ–¹æ³•è¿”å›å€¼ç‚ºvoidï¼Œé€™äº›æ–¹æ³•å–®ç´”çš„å¯¦ç¾é˜»å¡ç·šç¨‹ã€‚æˆ‘å€‘ç¾åœ¨æƒ³è®“æ‰€æœ‰taskåŸ·è¡Œå®Œç•¢(æˆ–è€…ä»»ä¸€taskåŸ·è¡Œå®Œç•¢)å¾Œï¼Œé–‹å§‹åŸ·è¡Œå¾ŒçºŒæ“ä½œï¼Œé€™æ™‚å°±å¯ä»¥ç”¨åˆ°WhenAny/WhenAllæ–¹æ³•ï¼Œ
+         é€™äº›æ–¹æ³•åŸ·è¡Œå®Œæˆè¿”å›ä¸€å€‹taskå¯¦ä¾‹ã€‚task.WhenAll(Task[] tasks) è¡¨ç¤ºæ‰€æœ‰çš„taskéƒ½åŸ·è¡Œå®Œç•¢å¾Œå†å»åŸ·è¡Œå¾ŒçºŒçš„æ“ä½œï¼Œ task.WhenAny(Task[] tasks) è¡¨ç¤ºä»»ä¸€taskåŸ·è¡Œå®Œç•¢å¾Œå°±é–‹å§‹åŸ·è¡Œå¾ŒçºŒæ“ä½œ
         */
         Task task1 = new Task(() => {
-            Debug.Log("¶i¤J½uµ{1 ·Ç³Æ sleep");
+            Debug.Log("é€²å…¥ç·šç¨‹1 æº–å‚™ sleep");
             Thread.Sleep(500);
-            Debug.Log("½uµ{1°õ¦æ§¹²¦¡I");
+            Debug.Log("ç·šç¨‹1åŸ·è¡Œå®Œç•¢ï¼");
         });
         task1.Start();
         Task task2 = new Task(() => {
-            Debug.Log("¶i¤J½uµ{2 ·Ç³Æ sleep");
+            Debug.Log("é€²å…¥ç·šç¨‹2 æº–å‚™ sleep");
             Thread.Sleep(3000);
-            Debug.Log("½uµ{2°õ¦æ§¹²¦¡I");
+            Debug.Log("ç·šç¨‹2åŸ·è¡Œå®Œç•¢ï¼");
         });
         task2.Start();
-        //task1¡Atask2°õ¦æ§¹¤F«á°õ¦æ«áÄò¾Ş§@
-        Task.WhenAll(task1, task2).ContinueWith((t) => {
-            Debug.Log("¶i¤J½uµ{3 ·Ç³Æ sleep");
+        //task1ï¼Œtask2åŸ·è¡Œå®Œäº†å¾ŒåŸ·è¡Œå¾ŒçºŒæ“ä½œ
+        Task.WhenAll(task1, task2).ContinueWith((t) =>
+        {
+            Debug.Log("é€²å…¥ç·šç¨‹3 æº–å‚™ sleep");
             Thread.Sleep(100);
-            Debug.Log("°õ¦æ«áÄò¾Ş§@§¹²¦¡I");
+            Debug.Log("åŸ·è¡Œå¾ŒçºŒæ“ä½œå®Œç•¢ï¼");
         });
+
+        //åªè¦æœ‰ä¸€å€‹ç·šç¨‹åŸ·è¡Œå®Œç•¢å°±æœƒé–‹å§‹åŸ·è¡Œå¾ŒçºŒæ“ä½œ
+        //Task.WhenAny(task1, task2).ContinueWith((t) => {
+        //    Debug.Log("é€²å…¥WhenAnyç·šç¨‹  æº–å‚™ sleep");
+        //    Thread.Sleep(100);
+        //    Debug.Log("åŸ·è¡Œå¾ŒçºŒæ“ä½œå®Œç•¢ï¼");
+        //});
+         
 
     }
 
