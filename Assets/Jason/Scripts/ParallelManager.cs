@@ -32,17 +32,76 @@ public class ParallelManager : MonoBehaviour
          */
         #region Parallel.Invoke 
         // Parallel.Invoke 內的委派沒執行完不不會跳出 Parallel執行緒(但是  Parallel內部執行會因 thread.sleap而改變順序)
-        Action<string> ActionTest = (string data) =>{ Thread.Sleep(5000);  Debug.Log($" ActionTest  ,thread :  {Thread.CurrentThread.ManagedThreadId}  data : {data}");  };
-        Action<string> ActionTest2 = (string data) => { Thread.Sleep(200); Debug.Log($"ActionTest2  ,thread :  {Thread.CurrentThread.ManagedThreadId}  data : {data}"); };
-        Action[] actions = new Action[] //定義委派陣列 並執行
-        {
-            ()=>{ActionTest("test1"); },
-            ()=>{ActionTest2("test2"); },
-            ()=>{ActionTest("test3"); } 
-        };
-        Debug.Log("Parallel.Invoke 1 Test");
-        Parallel.Invoke(actions);
-        Debug.Log("結束");
+        //Action<string> ActionTest = (string data) =>{ Thread.Sleep(5000);  Debug.Log($" ActionTest  ,thread :  {Thread.CurrentThread.ManagedThreadId}  data : {data}");  };
+        //Action<string> ActionTest2 = (string data) => { Thread.Sleep(200); Debug.Log($"ActionTest2  ,thread :  {Thread.CurrentThread.ManagedThreadId}  data : {data}"); };
+        //Action[] actions = new Action[] //定義委派陣列 並執行
+        //{
+        //    ()=>{ActionTest("test1"); },
+        //    ()=>{ActionTest2("test2"); },
+        //    ()=>{ActionTest("test3"); } 
+        //};
+        //Debug.Log("Parallel.Invoke 1 Test");
+        //Parallel.Invoke(actions);
+        //Debug.Log("結束");
+        #endregion
+        #region Parallel.for
+        //前两個参数定義了循環的開頭和结束。第 3個参数是一個Action<int>委托。 整数参数是循環的迭代次数,該參數被傳遞给Action<int>委托引用的方法，由於每次循環都開啟了新的任务和線呈，因此每个線程的直行行顺序是不能保正的。
+
+        //ParallelLoopResult result = Parallel.For(0, 10, i => {
+        //    Debug.Log(i);
+        //});
+        //Debug.Log(result.IsCompleted);// 這個值表示工作是否已經完成。
+
+
+        //int[] nums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        //Parallel.For(0, nums.Length, (i) =>
+        //{
+        //    Debug.Log($"num[i] :  {i}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+        //});
+
+        //========================中斷  (Stop/Break)========================================================
+        /*
+         Stop和Break，可以分別用來控制Parallel.For的執行。 
+         Stop  (像迴圈中的break): 
+                表示Parallel.For的執行立刻停止，無論其他執行單元是否達到停止的條件。
+         Break (像迴圈中的continune):
+                則表示滿足條件的當前執行單元立刻停止， 而對於其他執行單元，其中滿足停止條件也會通過Break停止，
+                其他未滿足停止條件的則會繼續執行下去，從而全部執行完畢，自然停止。當所有執行單元停止後, Parallel.For函式才停止執行並退出。
+         
+         */
+        //int[] nums = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        //break
+        //Parallel.For(1, nums.Length, (i, ParallelLoopState) =>
+        //{
+        //    // 當某一個迴圈單元的數大於30，
+        //    // 則跳出當前執行單元，等待其他執行單元結束
+        //    // 所有執行單元結束後退出Parallel.For的執行
+
+        //    if (i > 5)
+        //    {
+        //        // 跳出當前執行單元
+        //        ParallelLoopState.Break();
+        //        Debug.Log("break");
+        //        return;//不加return，可能會發生該程序資源未釋放。
+        //    }
+        //    Debug.Log($" {i}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+        //});
+        //stop
+        //Parallel.For(0, nums.Length, (int i, ParallelLoopState pls) =>
+        //{
+        //    // 當某一個迴圈單元的數大於x，
+        //    // 則停止Parallel.For的執行
+
+        //    if (i > 5)
+        //    {
+        //        // 停止並退出Parallel.For
+        //        pls.Stop();
+        //        return;
+        //    }
+        //    Debug.Log($" {i}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
+        //});
+        //Debug.Log("結束");
+
         #endregion
         #region 情境題
         /*
