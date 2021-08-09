@@ -113,6 +113,7 @@ public class ParallelManager : MonoBehaviour
         //    Debug.Log(data);
         //});
         //============================中斷==========================
+        //break
         //Parallel.ForEach<int>(nums, (data, ParallelLoopState) =>
         //{
         //    if (data ==5)
@@ -123,9 +124,10 @@ public class ParallelManager : MonoBehaviour
         //    Debug.Log($"num[i] :  {data}  , task : { Task.CurrentId} , thread : {Thread.CurrentThread.ManagedThreadId}");
              
         //});
+        //stop
         Parallel.ForEach<int>(nums, (data, ParallelLoopState) =>
         {
-            if (data > 5)
+            if (data < 5)
             {
                 ParallelLoopState.Stop();
                 return;
