@@ -185,7 +185,7 @@ public class TaskManager : MonoBehaviour
     //SemaphoreSlim 能用在 async/await 上最主要的是，它並沒有強制必須由同一個 Thread 來 Wait() 和 Release()
     static async Task LockDoWork()
     {
-        await Locker.WaitAsync();
+        await Locker.WaitAsync();//以非同步方式等候進入 SemaphoreSlim
         //Thread.Sleep就是對本身自己這個執行緒，進行睡眠的功能。而反觀Task.Delay是指，在本身這個執行緒下再去生出一個新的執行緒，並對這個執行緒做時間計算。
         //父執行緒生出一個子執行緒，並且叫子執行緒等候1秒，此時父執行緒的下一行早就被運行了，也就是說，子執行緒有沒有跑完根本不關父執行緒的事情了。
         //因此Task.Delay如果是要用在延遲的作用上，那麼就得要在前面加上個await才會有效 且該方法必須為 async
