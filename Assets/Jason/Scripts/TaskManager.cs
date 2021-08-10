@@ -62,15 +62,17 @@ public class TaskManager : MonoBehaviour
          Wait/WaitAny/WaitAll方法返回值為void，這些方法單純的實現阻塞線程。我們現在想讓所有task執行完畢(或者任一task執行完畢)後，開始執行後續操作，這時就可以用到WhenAny/WhenAll方法，
          這些方法執行完成返回一個task實例。task.WhenAll(Task[] tasks) 表示所有的task都執行完畢後再去執行後續的操作， task.WhenAny(Task[] tasks) 表示任一task執行完畢後就開始執行後續操作
         */
-        //Task task1 = new Task(() => {
+        //Task task1 = new Task(() =>
+        //{
         //    Debug.Log("進入線程1 準備 sleep");
-        //    Thread.Sleep(500);
+        //    Thread.Sleep(3000);
         //    Debug.Log("線程1執行完畢！");
         //});
         //task1.Start();
-        //Task task2 = new Task(() => {
+        //Task task2 = new Task(() =>
+        //{
         //    Debug.Log("進入線程2 準備 sleep");
-        //    Thread.Sleep(3000);
+        //    Thread.Sleep(500);
         //    Debug.Log("線程2執行完畢！");
         //});
         //task2.Start();
@@ -105,23 +107,22 @@ public class TaskManager : MonoBehaviour
         #region Task取消任務執行
         //CancellationTokenSource source = new CancellationTokenSource();
         //int index = 0;
-        //開啟一個task執行任務
+        ////開啟一個task執行任務
         //Task task1 = new Task(() =>
         //{
         //    while (!source.IsCancellationRequested)
         //    {
 
         //        Debug.Log($"第{++index}次執行，線程運行中...");//在文章內 會先執行 Thread.Sleep(1000),但有時執行時會 跑到第六次 ，大概是因為在 進入第六次thread.sleep 時 CancellationTokenSourceh 才變true(可能兩者的執行緒不同 因此計算不同 有誤差)
-        //                                                       //因此無法鎖到
+        //                                             //因此無法鎖到
         //        Thread.Sleep(1000);
         //    }
         //});
-        //task1.Start();
-        ////五秒後取消任務執行 
-        //Thread.Sleep(5000);
-        ////source.Cancel()方法請求取消任務，IsCancellationRequested會變成true
-        //source.Cancel();
+        //task1.Start(); 
+        //Thread.Sleep(5000);//五秒後取消任務執行  
+        //source.Cancel();//source.Cancel()方法請求取消任務，IsCancellationRequested會變成true
         //Debug.Log("執行緒結束");
+        //================================================================================================================================================
         /*
         CancellationTokenSource的功能不僅僅是取消任務執行，我們可以使用 source.CancelAfter(5000) 實現5秒後自動取消任務，也可以通過 source.Token.Register(Action action) 
         註冊取消任務觸發的回調函數，即任務被取消時註冊的action會被執行。 
@@ -143,14 +144,13 @@ public class TaskManager : MonoBehaviour
         //    {
 
         //        Debug.Log($"第{++index}次執行，線程運行中..." + source.IsCancellationRequested);//在文章內 會先執行 Thread.Sleep(1000),但有時執行時會 跑到第六次 ，大概是因為在 進入第六次thread.sleep 時 CancellationTokenSourceh 才變true(可能兩者的執行緒不同 因此計算不同 有誤差)
-        //                                                                                        //因此無法鎖到
+        //                                                                              //因此無法鎖到
 
         //        Thread.Sleep(1000);
         //    }
         //});
-        //task1.Start();
-        ////延時取消，效果等同於Thread.Sleep(5000);source.Cancel(); 
-        //source.CancelAfter(5000);
+        //task1.Start(); 
+        //source.CancelAfter(5000);//延時取消，效果等同於Thread.Sleep(5000);source.Cancel(); 
 
         #endregion
         #region 實現 locker
@@ -192,38 +192,38 @@ public class TaskManager : MonoBehaviour
         //http://slashview.com/archive2016/20160201.html
         #region 使用Thread.Sleep
         //使用Thread.Sleep( );
-        await Task.Run(
-            () =>
-            {
-                count++;
-                Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
-                Thread.Sleep(3000);
-                //if (count < 1)//限制條件 只執行一次
-                //{
-                //    count++;
-                //    Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
-                //    Thread.Sleep(3000);
-                //}
+        //await Task.Run(
+        //    () =>
+        //    {
+        //        count++;
+        //        Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
+        //        Thread.Sleep(3000);
+        //        //if (count < 1)//限制條件 只執行一次
+        //        //{
+        //        //    count++;
+        //        //    Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
+        //        //    Thread.Sleep(3000);
+        //        //}
 
-            });
+        //    });
         #endregion
         #region 使用await Task.Delay
         //使用await Task.Delay
-        //await Task.Run(
-        //async() =>
-        //   {
-                  //必須在 lamda 前放入 async 因為 await必須與 async搭配
-        //        //count++;
-        //        //Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}"); 
-        //        //await Task.Delay(3000);
-        //       if (count < 1)//限制條件 只執行一次
-        //       {
-        //           count++;
-        //           Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
-        //           await Task.Delay(3000);
-        //       }
+        await Task.Run(
+        async () =>
+           {
+               //必須在 lamda 前放入 async 因為 await必須與 async搭配
+               count++;
+               Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
+               await Task.Delay(3000);
+               //if (count < 1)//限制條件 只執行一次
+               //{
+               //    count++;
+               //    Debug.Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}_Do work. count = {count}");
+               //    await Task.Delay(3000);
+               //}
 
-        //   });
+           });
         #endregion
         Locker.Release();//執行完後釋放
 
