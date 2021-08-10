@@ -32,21 +32,40 @@ public class AsyncManager : MonoBehaviour
         採射後不理(Fire-and-Forget)哲學，呼叫後即失去掌握
      Start is called before the first frame update
     */
-    void Start()
+   void Start()
     {
 
+        #region 非同步執行
         //AsyncFunction();
-
-        //AsyncGetString();
+        //NoAsync();
+        #endregion
+        #region Task異步執行
+        //NoAsync();
         //TaskRun();
+        #endregion
+        #region 執行兩個迴圈 + 異步 
+        //AsyncFunction();
         //NoAsync();
         //NoAsync2();
-        //ShowNovoid();
+        #endregion 異步 取得資料
+        #region  異步取得資料 
+        //AsyncGetString();
+        //NoAsync();
+        #endregion
+        #region 執行 task
+        //task_1();
+        //Debug.Log("Hello World");//不會等待直接執行 雖然在 task 內會等待 顯示 但是 外部不會等task結束 ，除非 把 start 加上 async 並且 該task 加上await
+        #endregion
+        #region async task
         //taskFunction();
+        #endregion
+        #region await task delay
         //TaskRun();
+        #endregion
+        #region 使用 task 卻沒使用 async
         //沒加async 之方法 不會等待執行
         VoidNoAsyncFunc();
-        //NoAsync();
+        #endregion
 
 
     }
@@ -90,7 +109,9 @@ public class AsyncManager : MonoBehaviour
     #region task另外寫宣告 可先往下執行
     async void taskFunction()
     {
-        Task M_aSYNC = m_async();
+        Task M_aSYNC = new Task(() =>{ m_async(); });
+        M_aSYNC.Start();
+        //Task.Run(()=>{ m_async(); });
         Debug.Log("async執行中");
     }
     #endregion
@@ -103,13 +124,13 @@ public class AsyncManager : MonoBehaviour
     {
         await Task.Delay(5000);
         Debug.Log("m_async 執行完");
-
+       
     }
     async void AsyncGetString()
     {
         Debug.Log("GetString 開始");
         string getString = await strAsync("strAsync");
-        Debug.Log(getString);
+        Debug.Log("GetString :　"+getString);
     }
     ///可回傳值
     /// <summary>
@@ -123,7 +144,7 @@ public class AsyncManager : MonoBehaviour
         return GetString;
     }
 
-    async Task ShowNovoid()
+    async Task task_1()
     {
         Debug.Log("start wait");
         await Task.Delay(3000);
@@ -133,14 +154,12 @@ public class AsyncManager : MonoBehaviour
     }
     async void TaskRun()
     {
-        await Task.Run(() =>
-        {
-            Task.Delay(3000);
-            Debug.Log("wait finish");
+        Debug.Log("Start Task Run");
+        await Task.Delay(3000);
+        Debug.Log("Task wait finish");
 
 
 
-        });
 
     }
     /// <summary>
