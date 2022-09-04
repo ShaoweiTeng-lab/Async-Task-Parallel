@@ -15,16 +15,24 @@ public class TaskListManager : MonoBehaviour
     void Start()
     {
          
-        Btn.onClick.AddListener(Excute);
+       // Btn.onClick.AddListener(()=> { Excute(); });
         ListTask();
     }
  
-    async Task DoWork() {
-        Debug.Log("Hi" + Task.CurrentId);
-        await Task.Delay(0);
+    async Task DoWork()
+    {//使用時Task或在可用時Task<T>始終使用async / await
+        await Locker.WaitAsync();
+        var tasklist = new List<Task>() { 
+            Task.Run(async ()=>{  
+            await Task.Delay(3000);
+             Debug.Log("Hi");
+            })
+        };
+        Locker.Release();
+        await Task.WhenAll(tasklist);
 
     }
-    async void Excute() {
+    async Task Excute() {
         await Locker.WaitAsync();//以非同步方式等候進入 SemaphoreSlim
         
         Debug.Log("Excute  : " );
@@ -32,13 +40,15 @@ public class TaskListManager : MonoBehaviour
         Locker.Release();
     }
     async void ListTask()
-    {   
+    {
+       
         for (int i = 0; i < 5; i++)
         {
-            TaskList.Add(DoWork());
+            Debug.Log($"{i}   Start");
             await Task.Delay(1000);
+            TaskList.Add(DoWork());
         }
-        await Task.WhenAll(TaskList);
+        await Task.WhenAll(TaskList); //等待全部執行
         
         Debug.Log("Finish");
     }
